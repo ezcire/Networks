@@ -1,11 +1,16 @@
 #import socket module
+import socket
+import os
+import sys
 from socket import *
 serverSocket = socket(AF_INET, SOCK_STREAM) #Prepare a sever socket
 #Fill in start
+
+link = mysql.connector.connect(**config)
 #Fill in end
 while True:
 #Establish the connection
-print 'Ready to serve...'
+print('Ready to serve...')
 connectionSocket, addr =
 try:
 #Fill in start
