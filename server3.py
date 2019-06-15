@@ -2,12 +2,15 @@ import socket
 import argparse
 import threading
 
-connections_array = []
-connections_length = 0
-
+#get input from terminal as parse 
+#if no PORT input, set to default 8080
 parser = argparse.ArgumentParser()
 parser.add_argument("PortNumber", nargs = '?' , type = int, default = 8080)
 
+connections_array = []  #store clients in arrays
+connections_length = 0
+
+#multithread each client
 class Client(threading.Thread):
     def __init__(self, socket, address, id, name, signal):
         threading.Thread.__init__(self)
