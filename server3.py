@@ -1,6 +1,7 @@
 import socket
 import argparse
 import threading
+import requests
 
 #get input from terminal as parse 
 #if no PORT input, set to default 8080
@@ -11,7 +12,7 @@ connections_array = []  #store clients in arrays
 connections_length = 0
 
 #multithread each client
-class Client(threading.Thread):
+class add_client(threading.Thread):
     def __init__(self, socket, address, id, name, signal):
         threading.Thread.__init__(self)
         self.socket = socket
@@ -20,7 +21,6 @@ class Client(threading.Thread):
         self.name = name
         self.signal = signal 
         
-        
     def __str__(self):
         return str(self.id) + " " + str(self.address)
 
@@ -28,23 +28,27 @@ class Client(threading.Thread):
         while self.signal:
             try:
                 data = self.socket.recv(32)
-                print("actual data is", data)
             except:
                 print("Client " + str(self.address) + " has disconnected")
                 self.signal = False
                 connections_array.remove(self)
                 break
             if data != "":
-                print("ID " + str(self.id) + ": Filename :\t" + str(data.decode("utf-8")))
+                print("ID " + str(self.id) + ": ")
                 #open file
                 try:
                     filename = str(data.decode("utf-8"))
                     print("filename is ",filename)
                     f = open(filename, "r")
                     print(f.read())
+                    print("\n\n")
+                    #response = requests.get(filename)
+                    #print(response.status_code)
                    
-                except:
-                    print("oops")    
+                except IOError:
+                    print("404 oops could not read file")
+                    print("\n\n")
+                        
             for client in connections_array:
                     if client.id != self.id: 
                         client.socket.sendall(data) 
@@ -57,9 +61,9 @@ def new_connection(socket):
         global connections_length
         
     
-        connections_array.append(Client(connectionSocket, addr, connections_length, "Name", True))
+        connections_array.append(add_client(connectionSocket, addr, connections_length, "Name", True))
         connections_array[len(connections_array) - 1].start()
-        print("New connection at ID " + str(connections_array[len(connections_array) - 1]))
+        print("New client " + str(connections_array[len(connections_array) - 1]))
         connections_length += 1 
        #connectionSocket.send(bytes("Connected " + str(connectionSocket.getpeername()), "UTF-8"))
         
@@ -72,12 +76,12 @@ def main():
 
     getPort = parser.parse_args()
     port = getPort.PortNumber
-    print("port is ", port) #print for me to see
+   #print("port is ", port) #print for me to see
     serverSocket.bind(("localhost",port))
     serverSocket.listen(1)
 
-    newConnectionsThread = threading.Thread(target = new_connection, args = (serverSocket,))
-    newConnectionsThread.start()
+    add_new_thread = threading.Thread(target = new_connection, args = (serverSocket,))
+    add_new_thread.start()
 main()   
 
 

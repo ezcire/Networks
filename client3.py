@@ -3,9 +3,6 @@ import sys
 import argparse
 import threading
 
-#host = input("Enter IP Host: ")
-#port = int(input("Enter Port#: "))
-
 def receive(socket, signal):
     while signal:
         try:
@@ -38,19 +35,16 @@ try:
         serverSocket.sendall(str.encode(args.filename))
     except:
         print("could not send filename")
-
         serverSocket.close()    
-   # print (serverSocket.recv(1024))
 except:
     print("Sorry could not connect")
     input("Press enter to quit")
     sys.exit(0)
 
-receiveThread = threading.Thread(target = receive, args = (serverSocket, True))
-receiveThread.start()
+receive_thread = threading.Thread(target = receive, args = (serverSocket, True))
+receive_thread.start()
 
-#while True:
-#    message = args.filename
-#    serverSocket.sendall(bytes(message))
-
-#serverSocket.close()
+while True:
+    print("Enter filename")
+    message = input()
+    serverSocket.sendall(str.encode(message))
