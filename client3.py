@@ -8,6 +8,12 @@ def receive(socket, signal):
         try:
             data = socket.recv(32)
             print(str(data.decode("utf-8")))
+            q = str(data.decode("utf-8"))
+            if q == 'q':
+                print("disconnet\n")
+                serverSocket.close()
+                signal = False
+                break
         except:
             print("You have been disconnected from the server")
             signal = False
@@ -45,6 +51,11 @@ receive_thread = threading.Thread(target = receive, args = (serverSocket, True))
 receive_thread.start()
 
 while True:
-    print("Enter filename")
+    print("Enter filename\nPress q to quit")
     message = input()
+    if message == 'q':
+        serverSocket.sendall(str.encode(message))
+        input("Press enter to quit")
+        serverSocket.close()
+        break
     serverSocket.sendall(str.encode(message))

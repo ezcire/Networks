@@ -2,6 +2,7 @@ import socket
 import argparse
 import threading
 import requests
+import sys
 
 #get input from terminal as parse 
 #if no PORT input, set to default 8080
@@ -28,30 +29,41 @@ class add_client(threading.Thread):
         while self.signal:
             try:
                 data = self.socket.recv(32)
+                q = str(data.decode("utf-8"))
+                if q == 'q':
+                    print("Client " + str(self.address) + " has disconnected")
+                    self.signal = False
+                    connections_array.remove(self)
+                    break
             except:
                 print("Client " + str(self.address) + " has disconnected")
                 self.signal = False
                 connections_array.remove(self)
+                #self.socket.close()
                 break
             if data != "":
-                print("ID " + str(self.id) + ": ")
                 #open file
                 try:
+                    print("ID " + str(self.id) + ": ")
                     filename = str(data.decode("utf-8"))
                     print("filename is ",filename)
                     f = open(filename, "r")
                     print(f.read())
                     print("\n\n")
+                    f.close()  
                     #response = requests.get(filename)
                     #print(response.status_code)
-                   
+                    print("Ready to serve..")
+                    
                 except IOError:
                     print("404 oops could not read file")
                     print("\n\n")
+                    print("Ready to serve..")
                         
             for client in connections_array:
                     if client.id != self.id: 
-                        client.socket.sendall(data) 
+                        client.socket.sendall(data)
+                         
                             
 
 def new_connection(socket):
@@ -59,18 +71,11 @@ def new_connection(socket):
         print("Ready to serve..")
         connectionSocket, addr = socket.accept()
         global connections_length
-        
-    
         connections_array.append(add_client(connectionSocket, addr, connections_length, "Name", True))
         connections_array[len(connections_array) - 1].start()
         print("New client " + str(connections_array[len(connections_array) - 1]))
         connections_length += 1 
-       #connectionSocket.send(bytes("Connected " + str(connectionSocket.getpeername()), "UTF-8"))
-        
-
-
-#serverSocket.close()
-
+    connectionSocket.close()
 def main():
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -83,24 +88,5 @@ def main():
     add_new_thread = threading.Thread(target = new_connection, args = (serverSocket,))
     add_new_thread.start()
 main()   
-
-
-
-
-
-
-
-
-
-
-#while True:
-#    print("Ready to serve...")
-#    connectionSocket, addr = serverSocket.accept()
-    #connectionSocket.send(bytes('Connect successful', "UTF-8"))
-    
-#    connectionSocket.send(bytes("Connected " + str(connectionSocket.getpeername()), "UTF-8"))
-#    print("Connected: ", connectionSocket.getpeername())
-
-
 
 
