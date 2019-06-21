@@ -15,8 +15,8 @@ def receive(socket, signal):
             break
 
 #Get host and port
-host = input("Host: ")
-port = int(input("Port: "))
+host = socket.gethostname()
+port = 8080
 
 #Attempt connection to server
 try:

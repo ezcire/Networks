@@ -28,7 +28,7 @@ class Client(threading.Thread):
     def run(self):
         while self.signal:
             try:
-                data = self.socket.recv(32)
+                data = self.socket.recv(1024)
             except:
                 print("Client " + str(self.address) + " has disconnected")
                 self.signal = False
@@ -52,8 +52,8 @@ def newConnections(socket):
 
 def main():
     #Get host and port
-    host = input("Host: ")
-    port = int(input("Port: "))
+    host = socket.gethostname()
+    port = 8080
 
     #Create new server socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
